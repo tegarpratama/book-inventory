@@ -11,26 +11,40 @@ router.get('/books', isAuth, masterController.index);
 router.get('/add-book', isAuth, masterController.create);
 
 router.post('/add-book', [
-   body('title', 'Title is required.')
-      .isAlphanumeric()
+   body('title')
+      .notEmpty()
+      .withMessage('Title is required')
+      .isString()
       .trim(),
-   body('author', 'Author is required.')
-      .isAlphanumeric()
+   body('author')
+      .notEmpty()
+      .withMessage('Author is required')
+      .isString()
       .trim(),
-   body('publisher', 'Publisher is required')
-      .isAlphanumeric()
+   body('publisher')
+      .notEmpty()
+      .withMessage('Publisher is required')
+      .isString()
       .trim(),
-   body('description', 'Description is required.')
-      .isAlphanumeric(),
-   body('price', 'Price is required.')
-      .isFloat()
-      .withMessage('Price must number.'),
-   body('totalPages', 'Total pages is required.')
+   body('totalPages')
+      .notEmpty()
+      .withMessage('Total pages is required')
       .isInt()
       .withMessage('Total pages must number.'),
-   body('stock', 'Stock is required.')
+   body('price')
+      .notEmpty()
+      .withMessage('Price is required')
+      .isFloat()
+      .withMessage('Price must number.'),
+   body('stock')
+      .notEmpty()
+      .withMessage('Stock pages is required')
       .isInt()
-      .withMessage('Stock must number.')
+      .withMessage('Stock must number.'),
+   body('description')
+      .notEmpty()
+      .withMessage('Description is required')
+      .isString(),
 ], isAuth, masterController.store);
 
 router.get('/edit-book/:bookId', isAuth, masterController.edit)

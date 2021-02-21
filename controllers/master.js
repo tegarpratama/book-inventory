@@ -4,25 +4,34 @@ const Book = require('../models/book');
 const fileHelper = require('../config/file.js');
 
 exports.index = async (req, res, next) => {
-   const books = await Book.findAll();
-   
-   res.render('main', {
-      pageTitle: 'Books',
-      path: '/master',
-      view: 'master/books.ejs',
-      books: books,
-   });
+   try {
+      const books = await Book.findAll();
+
+      res.render('main', {
+         pageTitle: 'Books',
+         path: '/master',
+         view: '/pages/master/books.ejs',
+         books: books,
+         type: req.flash('type'),
+         message: req.flash('message')
+      });
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+   } 
 };
 
 exports.create = (req, res, next) => {
    res.render('main', {
       pageTitle: 'Add Book',
       path: '/master',
-      view: 'master/edit-book.ejs',
+      view: 'pages/master/edit-book.ejs',
       editing: false,
       hasError: false,
-      errorMessage: null,
-      validationErrors: []
+      type: '',
+      message: [],
+      validationErrors: [],
    });
 };
 
@@ -35,13 +44,13 @@ exports.store = (req, res, next) => {
    const price = req.body.price;
    const stock = req.body.stock;
    const description = req.body.description;
-   const cover = req.file;
+   let cover;
    
    if(!errors.isEmpty()) {
       return res.status(422).render('main', {
          pageTitle: 'Add Book',
          path: '/master',
-         view: 'master/edit-book.ejs',
+         view: '/pages/master/edit-book.ejs',
          editing: false,
          hasError: true,
          book: {
@@ -53,9 +62,16 @@ exports.store = (req, res, next) => {
             stock: stock,
             description: description,
          },
-         errorMessage: errors.array()[0].msg,
-         validationErrors: errors.array()
+         type: 'danger',
+         message: errors.array()[0].msg,
+         validationErrors: errors.array(),
       });
+   }
+
+   if (req.file) {
+      cover = req.file.path.replace(/\\/g, "/");
+   } else {
+      cover = '';
    }
 
    const book = new Book({
@@ -66,12 +82,14 @@ exports.store = (req, res, next) => {
       price: price,
       stock: stock,
       description: description,
-      cover: cover.path.replace(/\\/g, "/"),
+      cover: cover,
       userId: req.user.id
    });
    
    book.save()
       .then(() => {
+         req.flash('type', 'success');
+         req.flash('message', 'Success added book');
          res.redirect('/master/books');
       })
       .catch(err => {
@@ -83,32 +101,51 @@ exports.store = (req, res, next) => {
 
 exports.edit = async (req, res, next) => {
    const bookId = req.params.bookId;
-   const book = await Book.findByPk(bookId, { userId: req.user.id })
 
-   if(!book) {
-      return res.redirect('/master/books');
+   try {
+      const book = await Book.findByPk(bookId, { userId: req.user.id })
+
+      if(!book) {
+         req.flash('type', 'danger');
+         req.flash('message', 'Book not found');
+         return res.redirect('/master/books');
+      }
+
+      res.render('main', {
+         pageTitle: 'Edit Book',
+         path: '/master',
+         view: 'pages/master/edit-book.ejs',
+         editing: true,
+         book: book,
+         hasError: false,
+         type: '',
+         message: [],
+         validationErrors: [],
+      });
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
    }
-
-   res.render('main', {
-      pageTitle: 'Edit Book',
-      path: '/master',
-      view: 'master/edit-book.ejs',
-      editing: true,
-      book: book,
-      hasError: false,
-      errorMessage: null,
-      validationErrors: []
-   });
 };
 
 exports.update = async (req, res, next) => {
    const errors = validationResult(req);
+   const bookId = req.body.bookId;
+   const title = req.body.title;
+   const author = req.body.author;
+   const publisher = req.body.publisher;
+   const totalPages = req.body.totalPages;
+   const price = req.body.price;
+   const stock = req.body.stock;
+   const description = req.body.description;
+   const cover = req.file;
 
    if(!errors.isEmpty()) {
       return res.status(422).render('main', {
          pageTitle: 'Edit Book',
          path: '/master',
-         view: 'master/edit-book.ejs',
+         view: 'pages/master/edit-book.ejs',
          editing: true,
          hasError: true,
          book: {
@@ -121,69 +158,74 @@ exports.update = async (req, res, next) => {
             stock: stock,
             description: description,
          },
-         errorMessage: errors.array()[0].msg,
-         validationErrors: errors.array()
+         type: 'danger',
+         message: errors.array()[0].msg,
+         validationErrors: errors.array(),
       });
    }
 
-   const bookId = req.body.bookId;
-   const title = req.body.title;
-   const author = req.body.author;
-   const publisher = req.body.publisher;
-   const totalPages = req.body.totalPages;
-   const price = req.body.price;
-   const stock = req.body.stock;
-   const description = req.body.description;
-   const cover = req.file;
+   try {
+      const book = await Book.findByPk(bookId);
+      book.title = title;
+      book.author = author;
+      book.publisher = publisher;
+      book.totalPages = totalPages;
+      book.price = price;
+      book.stock = stock;
+      book.description = description;
+      book.userId = req.user.id;
 
-   Book.findByPk(bookId)
-      .then(book => {
-         book.title = title;
-         book.author = author;
-         book.publisher = publisher;
-         book.totalPages = totalPages;
-         book.price = price;
-         book.stock = stock;
-         book.description = description;
-         book.userId = req.user.id;
+      if(cover) {
+         fileHelper.deleteFile(book.cover);
+         book.cover = cover.path.replace(/\\/g, "/");
+      }
 
-         if(cover) {
-            fileHelper.deleteFile(book.cover);
-            book.cover = cover.path.replace(/\\/g, "/");
-         }
-
-         return book.save();
-      })
-      .then(() => {
-         res.redirect('/master/books');
-      })
-      .catch(err => {
-         console.log(err);
-      });   
+      await book.save();
+      res.redirect('/master/books');
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+   }
 };
 
 exports.show = async (req, res, next) => {
    const bookId = req.params.bookId;
-   const book = await Book.findByPk(bookId, { id: bookId });
 
-   if(!book) {
-      return res.redirect('/books');
+   try {
+      const book = await Book.findByPk(bookId, { id: bookId });
+
+      if(!book) {
+         return res.redirect('/books');
+      }
+
+      res.render('main', {
+         pageTitle: 'Detail Book',
+         path: '/master',
+         view: 'pages/master/detail-book.ejs',
+         book: book
+      });
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
    }
-
-   res.render('main', {
-      pageTitle: 'Edit Book',
-      path: '/master',
-      view: 'master/detail-book.ejs',
-      book: book
-   });
 };
 
 exports.destroy = async (req, res, next) => {
    const bookId = req.body.bookId;
-   const book = await Book.findByPk(bookId);
 
-   fileHelper.deleteFile(book.cover);
-   await book.destroy();
+   try {
+      const book = await Book.findByPk(bookId);
 
-   res.redirect('/master/books');
+      fileHelper.deleteFile(book.cover);
+      await book.destroy();
+      req.flash('type', 'success');
+      req.flash('message', 'Success deleted book');
+      res.redirect('/master/books');
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+   }
 };

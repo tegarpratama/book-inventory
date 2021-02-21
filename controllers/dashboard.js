@@ -2,6 +2,8 @@ exports.getIndex = (req, res, next) => {
    res.render('main', {
       pageTitle: 'Dashboard',
       path: '/',
-      view: 'dashboard/index.ejs'
+      view: 'pages/dashboard/index.ejs',
+      type: req.flash('type'),
+      message: req.flash('message')
    });
 };

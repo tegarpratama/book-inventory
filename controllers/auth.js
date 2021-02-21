@@ -1,53 +1,56 @@
 const bcyrpt = require('bcryptjs');
+
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
-   let message = req.flash('error');
-
-   if (message.length > 0) {
-      message = message[0];
-   } else {
-      message = null;
-   }
-
    res.render('auth/login', {
       path: '/login',
       pageTitle: 'Login',
-      errorMessage: message
+      type: req.flash('type'),
+      message: req.flash('error'),
    });
 }
 
-exports.postLogin = async (req, res, next) => {
+exports.postLogin = async (req, res) => {
    const email = req.body.email;
    const password = req.body.password;
    
    try {
       const user = await User.findOne({ where: { email: email} });
+      const isMatch = await bcyrpt.compare(password, user.password);
 
       if (!user) {
+         req.flash('type', 'danger');
          req.flash('error', 'Account not found');
          return res.redirect('/login');
       }
 
-      const isMatch = await bcyrpt.compare(password, user.password);
-
       if (isMatch) {
+         await req.session.save();
          req.session.isLoggedIn = true;
          req.session.user = user;
-         await req.session.save()
+         req.flash('type', 'primary');
+         req.flash('message', 'Welcome Back!');
          return res.redirect('/');
       }
 
+      req.flash('type', 'danger');
       req.flash('error', 'Account not found');
       res.redirect('/login');
-   } catch (error) {
-      console.log(error);
-      res.redirect('/login');
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
    }
 }
 
-exports.logout = (req, res, next) => {
-   req.session.destroy(err => {
+exports.logout = async (req, res, next) => {
+   try {
+      await req.session.destroy();;
       res.redirect('/login');
-   });
+   } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+   }
 }

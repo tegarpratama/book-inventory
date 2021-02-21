@@ -2,11 +2,7 @@
    <h1 class="h2"><%= pageTitle %> </h1>
 </div>
 
-<% if (errorMessage) { %>
-   <div class="alert alert-danger text-center" role="alert">
-      <strong><%= errorMessage %></strong>
-   </div>
-<% } %>
+<%- include('../../includes/alert.ejs', {type: type, message: message} ) %> 
 
 <form action="<% if (editing) { %>/master/edit-book<% } else { %>/master/add-book<% } %>" method="POST" enctype="multipart/form-data">
    <% if (editing) { %>
@@ -32,15 +28,15 @@
    <div class="form-row mt-4">
       <div class="col">
          <label for="totalPages">Total Pages</label>
-         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'totalPages') ? 'is-invalid' : '' %> " name="totalPages" id="totalPages" value="<% if (editing || hasError) { %><%= book.totalPages  %><% } %>">
+         <input type="number" class="form-control <%= validationErrors.find(e => e.param === 'totalPages') ? 'is-invalid' : '' %> " name="totalPages" id="totalPages" value="<% if (editing || hasError) { %><%= book.totalPages  %><% } %>">
       </div>
       <div class="col">
          <label for="price">Price</label>
-         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'is-invalid' : '' %> " name="price" id="price" value="<% if (editing || hasError) { %><%= book.price %><% } %>">
+         <input type="numbe" class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'is-invalid' : '' %> " name="price" id="price" value="<% if (editing || hasError) { %><%= book.price %><% } %>">
    </div>
       <div class="col">
          <label for="stock">Stock</label>
-         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'stock') ? 'is-invalid' : '' %> " name="stock" id="stock" value="<% if (editing || hasError) { %><%= book.stock %><% } %>">
+         <input type="numbe" class="form-control <%= validationErrors.find(e => e.param === 'stock') ? 'is-invalid' : '' %> " name="stock" id="stock" value="<% if (editing || hasError) { %><%= book.stock %><% } %>">
    </div>
    </div>
 

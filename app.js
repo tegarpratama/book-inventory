@@ -6,8 +6,8 @@ const express = require('express');
 const session = require('express-session');
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const bodyParser = require('body-parser');
-const flash = require('connect-flash');
 const multer = require('multer');
+const flash = require('connect-flash');
 
 // import file
 const errorController = require('./controllers/error');
