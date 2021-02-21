@@ -1,0 +1,64 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+   <h1 class="h2"><%= pageTitle %> </h1>
+</div>
+
+<% if (errorMessage) { %>
+   <div class="alert alert-danger text-center" role="alert">
+      <strong><%= errorMessage %></strong>
+   </div>
+<% } %>
+
+<form action="<% if (editing) { %>/master/edit-book<% } else { %>/master/add-book<% } %>" method="POST" enctype="multipart/form-data">
+   <% if (editing) { %>
+      <input type="hidden" value="<%= book.id %>" name="bookId">
+  <% } %>
+
+   <div class="form-group">
+      <label for="title">Title</label>
+      <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'title') ? 'is-invalid' : '' %> " name="title" id="title" value="<% if (editing || hasError) { %><%= book.title  %><% } %>">
+   </div>
+
+   <div class="form-row mt-4">
+      <div class="col">
+         <label for="author">Author</label>
+         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'author') ? 'is-invalid' : '' %> " name="author" id="author" value="<% if (editing || hasError) { %><%= book.author %><% } %>">
+      </div>
+      <div class="col">
+         <label for="publisher">Publisher</label>
+         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'publisher') ? 'is-invalid' : '' %> " name="publisher" id="publisher" value="<% if (editing || hasError) { %><%= book.publisher  %><% } %>">
+      </div>
+   </div>
+
+   <div class="form-row mt-4">
+      <div class="col">
+         <label for="totalPages">Total Pages</label>
+         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'totalPages') ? 'is-invalid' : '' %> " name="totalPages" id="totalPages" value="<% if (editing || hasError) { %><%= book.totalPages  %><% } %>">
+      </div>
+      <div class="col">
+         <label for="price">Price</label>
+         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'price') ? 'is-invalid' : '' %> " name="price" id="price" value="<% if (editing || hasError) { %><%= book.price %><% } %>">
+   </div>
+      <div class="col">
+         <label for="stock">Stock</label>
+         <input type="text" class="form-control <%= validationErrors.find(e => e.param === 'stock') ? 'is-invalid' : '' %> " name="stock" id="stock" value="<% if (editing || hasError) { %><%= book.stock %><% } %>">
+   </div>
+   </div>
+
+   <div class="form-group mt-4">
+      <label for="description">Description</label>
+      <textarea class="form-control <%= validationErrors.find(e => e.param === 'description') ? 'is-invalid' : '' %> " id="description" name="description" rows="5"><% if (editing || hasError) { %><%= book.description %><% } %></textarea>
+   </div>
+
+   <div class="form-group mt-4">
+      <label for="cover">Book Cover</label>
+      <input type="file" class="form-control-file" id="cover" name="cover">
+    </div>
+
+   <div class="row mt-5">
+      <div class="col">
+         <a href="/master/books" class="btn btn-secondary btn-sm"><i class="fas fa-chevron-circle-left mr-2"></i>Back</a>
+         <button type="submit" name="submit" class="btn btn-primary btn-sm float-right"><i class="fas fa-save mr-2"></i>Save</button>
+      </div>
+   </div>
+
+</form>
