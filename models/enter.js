@@ -2,14 +2,14 @@ const { DataTypes } = require('sequelize');
 
 const sequelize = require('../config/database');
 
-const ExitBook = sequelize.define('exitBook', {
+const enter = sequelize.define('enter', {
    id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       allowNull: false,
       primaryKey: true
    },
-   stockOut: DataTypes.INTEGER
+   stockIn: DataTypes.INTEGER
 });
 
-module.exports = ExitBook;
+module.exports = enter;

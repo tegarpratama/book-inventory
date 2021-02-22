@@ -1,0 +1,35 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+   <h1 class="h2"><%= pageTitle %> </h1>
+</div>
+
+<%- include('../../includes/alert.ejs', { type: type, message: message }) %> 
+
+<div class="row">
+   <div class="col-8">
+      <form action="/transaksi/tambah-barang" method="POST">
+         <div class="form-group">
+            <label>Judul Buku</label>
+            <select class="form-control" name="bookId">
+            <option value="">Pilih Judul Buku</option>
+            <% for( let book of books ) { %>
+               <option value="<%= book.id %>"><%= book.title %></option>
+            <% } %>
+            </select>
+         </div>
+      
+         <div class="form-group">
+            <label>Jumlah Barang Masuk</label>
+            <input type="number" class="form-control" name="stockIn">
+         </div>
+      
+         <div class="row mt-5">
+            <div class="col">
+               <a href="/transaksi/barang-masuk" class="btn btn-secondary btn-sm"><i class="fas fa-chevron-circle-left mr-2"></i>Kembali</a>
+               <button type="submit" name="submit" class="btn btn-primary btn-sm float-right"><i class="fas fa-save mr-2"></i>Simpan</button>
+            </div>
+         </div>
+      
+      </form>
+   </div>
+</div>
+

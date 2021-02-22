@@ -6,53 +6,53 @@ const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-router.get('/books', isAuth, masterController.index);
+router.get('/buku', isAuth, masterController.index);
 
-router.get('/add-book', isAuth, masterController.create);
+router.get('/tambah-buku', isAuth, masterController.create);
 
-router.post('/add-book', [
+router.post('/tambah-buku', [
    body('title')
       .notEmpty()
-      .withMessage('Title is required')
+      .withMessage('Judul buku tidak boleh kosong')
       .isString()
       .trim(),
    body('author')
       .notEmpty()
-      .withMessage('Author is required')
+      .withMessage('Penulis tidak boleh kosong')
       .isString()
       .trim(),
    body('publisher')
       .notEmpty()
-      .withMessage('Publisher is required')
+      .withMessage('Penerbit tidak boleh kosong')
       .isString()
       .trim(),
    body('totalPages')
       .notEmpty()
-      .withMessage('Total pages is required')
+      .withMessage('Jumlah halaman tidak boleh kosong')
       .isInt()
-      .withMessage('Total pages must number.'),
+      .withMessage('Jumlah halaman harus angka'),
    body('price')
       .notEmpty()
-      .withMessage('Price is required')
+      .withMessage('Harga buku tidak boleh kosong')
       .isFloat()
-      .withMessage('Price must number.'),
+      .withMessage('Harga buku harus berupa angka'),
    body('stock')
       .notEmpty()
-      .withMessage('Stock pages is required')
+      .withMessage('Stok pages tidak boleh kosong')
       .isInt()
-      .withMessage('Stock must number.'),
+      .withMessage('Stok harus angka'),
    body('description')
       .notEmpty()
-      .withMessage('Description is required')
+      .withMessage('Deskripsi tidak boleh kosong')
       .isString(),
 ], isAuth, masterController.store);
 
-router.get('/edit-book/:bookId', isAuth, masterController.edit)
+router.get('/ubah-buku/:bookId', isAuth, masterController.edit)
 
-router.post('/edit-book', isAuth, masterController.update);
+router.post('/ubah-buku', isAuth, masterController.update);
 
-router.get('/detail-book/:bookId', isAuth, masterController.show);
+router.get('/detail-buku/:bookId', isAuth, masterController.show);
 
-router.post('/delete-book', isAuth, masterController.destroy);
+router.post('/hapus-buku', isAuth, masterController.destroy);
 
 module.exports = router;

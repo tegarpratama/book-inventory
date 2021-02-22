@@ -11,9 +11,10 @@ exports.getLogin = (req, res, next) => {
    });
 }
 
-exports.postLogin = async (req, res) => {
+exports.postLogin = async (req, res, next) => {
    const email = req.body.email;
    const password = req.body.password;
+   console.log(password);
    
    try {
       const user = await User.findOne({ where: { email: email} });
@@ -21,7 +22,7 @@ exports.postLogin = async (req, res) => {
 
       if (!user) {
          req.flash('type', 'danger');
-         req.flash('error', 'Account not found');
+         req.flash('error', 'Email atau password salah');
          return res.redirect('/login');
       }
 
@@ -29,15 +30,16 @@ exports.postLogin = async (req, res) => {
          await req.session.save();
          req.session.isLoggedIn = true;
          req.session.user = user;
-         req.flash('type', 'primary');
-         req.flash('message', 'Welcome Back!');
+         req.flash('type', 'success');
+         req.flash('message', 'Selamat Datang');
          return res.redirect('/');
       }
 
       req.flash('type', 'danger');
-      req.flash('error', 'Account not found');
+      req.flash('error', 'Email atau password salah');
       res.redirect('/login');
    } catch (err) {
+      console.log(err);
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);

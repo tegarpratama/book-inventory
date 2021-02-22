@@ -8,7 +8,7 @@ exports.index = async (req, res, next) => {
       const books = await Book.findAll();
 
       res.render('main', {
-         pageTitle: 'Books',
+         pageTitle: 'Data Buku',
          path: '/master',
          view: '/pages/master/books.ejs',
          books: books,
@@ -24,7 +24,7 @@ exports.index = async (req, res, next) => {
 
 exports.create = (req, res, next) => {
    res.render('main', {
-      pageTitle: 'Add Book',
+      pageTitle: 'Tambah Buku',
       path: '/master',
       view: 'pages/master/edit-book.ejs',
       editing: false,
@@ -48,7 +48,7 @@ exports.store = (req, res, next) => {
    
    if(!errors.isEmpty()) {
       return res.status(422).render('main', {
-         pageTitle: 'Add Book',
+         pageTitle: 'Tambah Book',
          path: '/master',
          view: '/pages/master/edit-book.ejs',
          editing: false,
@@ -89,8 +89,8 @@ exports.store = (req, res, next) => {
    book.save()
       .then(() => {
          req.flash('type', 'success');
-         req.flash('message', 'Success added book');
-         res.redirect('/master/books');
+         req.flash('message', 'Berhasil menambahkan data buku baru');
+         res.redirect('/master/buku');
       })
       .catch(err => {
          const error = new Error(err);
@@ -107,12 +107,12 @@ exports.edit = async (req, res, next) => {
 
       if(!book) {
          req.flash('type', 'danger');
-         req.flash('message', 'Book not found');
-         return res.redirect('/master/books');
+         req.flash('message', 'Buku tidak ditemukan');
+         return res.redirect('/master/buku');
       }
 
       res.render('main', {
-         pageTitle: 'Edit Book',
+         pageTitle: 'Ubah Buku',
          path: '/master',
          view: 'pages/master/edit-book.ejs',
          editing: true,
@@ -143,7 +143,7 @@ exports.update = async (req, res, next) => {
 
    if(!errors.isEmpty()) {
       return res.status(422).render('main', {
-         pageTitle: 'Edit Book',
+         pageTitle: 'Ubah Book',
          path: '/master',
          view: 'pages/master/edit-book.ejs',
          editing: true,
@@ -181,7 +181,7 @@ exports.update = async (req, res, next) => {
       }
 
       await book.save();
-      res.redirect('/master/books');
+      res.redirect('/master/buku');
    } catch (err) {
       const error = new Error(err);
       error.httpStatusCode = 500;
@@ -196,11 +196,11 @@ exports.show = async (req, res, next) => {
       const book = await Book.findByPk(bookId, { id: bookId });
 
       if(!book) {
-         return res.redirect('/books');
+         return res.redirect('/master/buku');
       }
 
       res.render('main', {
-         pageTitle: 'Detail Book',
+         pageTitle: 'Detail Buku',
          path: '/master',
          view: 'pages/master/detail-book.ejs',
          book: book
@@ -217,12 +217,11 @@ exports.destroy = async (req, res, next) => {
 
    try {
       const book = await Book.findByPk(bookId);
-
       fileHelper.deleteFile(book.cover);
       await book.destroy();
       req.flash('type', 'success');
-      req.flash('message', 'Success deleted book');
-      res.redirect('/master/books');
+      req.flash('message', 'Buku berhasil dihapus');
+      res.redirect('/master/buku');
    } catch (err) {
       const error = new Error(err);
       error.httpStatusCode = 500;

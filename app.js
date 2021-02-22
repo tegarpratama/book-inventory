@@ -13,9 +13,10 @@ const flash = require('connect-flash');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 const Book = require('./models/book');
-const BookIn = require('./models/income-book')
-const BookOut = require('./models/exit-book');
+const Enter = require('./models/enter')
+const Exit = require('./models/exit');
 const sequelize = require('./config/database');
+
 
 // define express
 const app = express();
@@ -36,6 +37,7 @@ app.use(
 
 // use session
 app.use(flash());
+
 
 // define file storage for image
 const fileStorage = multer.diskStorage({
@@ -68,6 +70,7 @@ app.set('views', 'views');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const masterRoutes = require('./routes/master');
+const transactionRoutes = require('./routes/transaction');
 
 // configure body-parser package
 app.use(bodyParser.urlencoded({ extended: false}));
@@ -91,30 +94,33 @@ app.use((req, res, next) => {
       .catch(err => console.log(err));
 });
 
+
+
 // routes
 app.use(authRoutes);
 app.use(dashboardRoutes);
 app.use('/master', masterRoutes);
+app.use('/transaksi', transactionRoutes);
 app.get('/500', errorController.get500);
 app.use(errorController.get404);
 
 // route for error
-app.use((error, req, res, next) => {
-   res.status(500).render('error/500', {
-      pageTitle: 'Something when wrong',
-      path: '/500'
-   });
-});
+// app.use((error, req, res, next) => {
+//    res.status(500).render('error/500', {
+//       pageTitle: 'Something when wrong',
+//       path: '/500'
+//    });
+// });
 
 // set relation table
 User.hasOne(Book);
 Book.belongsTo(User);
 
-User.belongsToMany(Book, { through: BookIn });
-Book.belongsToMany(User, { through: BookIn });
+User.belongsToMany(Book, { through: Enter });
+Book.belongsToMany(User, { through: Enter });
 
-User.belongsToMany(Book, { through: BookOut });
-Book.belongsToMany(User, { through: BookOut });
+User.belongsToMany(Book, { through: Exit });
+Book.belongsToMany(User, { through: Exit });
 
 // migrate database
 sequelize.sync()

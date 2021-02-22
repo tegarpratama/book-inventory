@@ -1,0 +1,51 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+   <h1 class="h2"><%= pageTitle %> </h1>
+</div>
+
+<%- include('../../includes/alert.ejs', { type: type, message: message }) %> 
+
+<div class="row mt-4">
+   <div class="col">
+      <a href="/transaksi/tambah-barang-masuk" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-2"></i>Barang Masuk</a>
+   </div>
+   <div class="col">
+      <form class="form-inline float-right" action="" method="post">
+         <label class="sr-only" for="inlineFormInputGroupSearch2">Cari</label>
+         <div class="input-group mb-2 mr-sm-2">
+            <input type="text" name="keyword" class="form-control form-control-sm" id="inlineFormInputGroupSearch2" placeholder="Cari sesuatu...">
+         </div>
+         <button type="submit" name="search" class="btn btn-primary btn-sm mb-2"><i class="fas fa-search "></i></button>
+      </form>
+   </div>
+</div>
+
+<% if (books.length > 0) { %>
+   <table class="table table-bordered mt-3 text-center">
+      <thead>
+         <tr>
+            <th scope="col">Nama Buku</th>
+            <th scope="col">Total Buku Masuk</th>
+            <th scope="col">Tanggal</th>
+            <th scope="col" style="width:  9%">Action</th>
+         </tr>
+      </thead>
+      <tbody>
+         <% for (let book of books) { %>
+            <tr>
+               <td><%= book.title %> </td>
+               <td><%= book.stockIn %> </td>
+               <td><%= book.createdAt %> </td>
+               <td>
+                  <form action="/transaksi/hapus-barang-masuk" method="POST">
+                     <input type="hidden" name="bookId" value="<%= book.id %>">
+                     <button type="submit" name="submit"><i class="fas fa-trash"></i></button>
+                  </form>
+               </td>
+            </tr>
+         <% } %>
+      </tbody>
+   </table>
+<% } else { %>
+   <h4 class="text-center mt-5">Barang Masuk Kosong</h4>
+<% } %>
+

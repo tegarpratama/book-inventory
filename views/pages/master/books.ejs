@@ -4,13 +4,13 @@
 
 <div class="row mt-4">
    <div class="col">
-      <a href="/master/add-book" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-2"></i>Book</a>
+      <a href="/master/tambah-buku" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-2"></i>Buku</a>
    </div>
    <div class="col">
       <form class="form-inline float-right" action="" method="post">
-         <label class="sr-only" for="inlineFormInputGroupSearch2">Search</label>
+         <label class="sr-only" for="inlineFormInputGroupSearch2">Cari</label>
          <div class="input-group mb-2 mr-sm-2">
-            <input type="text" name="keyword" class="form-control form-control-sm" id="inlineFormInputGroupSearch2" placeholder="Search Something...">
+            <input type="text" name="keyword" class="form-control form-control-sm" id="inlineFormInputGroupSearch2" placeholder="Cari sesuatu...">
          </div>
          <button type="submit" name="search" class="btn btn-primary btn-sm mb-2"><i class="fas fa-search "></i></button>
       </form>
@@ -20,14 +20,14 @@
 <%- include('../../includes/alert.ejs', { type: type, message: message }) %> 
 
 <% if (books.length > 0) { %>
-   <table class="table table-bordered mt-3">
+   <table class="table table-bordered mt-3 text-center">
       <thead>
          <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Author</th>
-            <th scope="col">Publisher</th>
-            <th scope="col">Stock</th>
-            <th scope="col" style="width:  12%">Action</th>
+            <th scope="col">Judul</th>
+            <th scope="col">Penulis</th>
+            <th scope="col">Penerbit</th>
+            <th scope="col">Stok Tersisa</th>
+            <th scope="col" style="width:  12%">Aksi</th>
          </tr>
       </thead>
       <tbody>
@@ -38,9 +38,9 @@
                <td><%= book.publisher  %> </td>
                <td><%= book.stock %> </td>
                <td>
-                  <a href="/master/detail-book/<%= book.id %>" class="btn btn-secondary btn-sm  text-light"><i class="fas fa-info-circle"></i></a>
-                  <a href="/master/edit-book/<%= book.id %>" class="btn btn-warning btn-sm text-light"><i class="fas fa-edit"></i></a>
-                  <form action="/master/delete-book" method="POST" class="d-inline">
+                  <a href="/master/detail-buku/<%= book.id %>" class="btn btn-secondary btn-sm  text-light"><i class="fas fa-info-circle"></i></a>
+                  <a href="/master/ubah-buku/<%= book.id %>" class="btn btn-warning btn-sm text-light"><i class="fas fa-edit"></i></a>
+                  <form action="/master/hapus-buku" method="POST" class="d-inline">
                      <input type="hidden" name="bookId" value="<%= book.id %>">
                      <button type="submit" class="btn btn-danger btn-sm text-light"><i class="fas fa-trash"></i></button>
                   </form>
@@ -51,7 +51,7 @@
    </table>
 <% } else { %>
    <div class="mt-5">
-      <h3 class="text-center">No Books Found!</h3>
+      <h3 class="text-center">Data Buku Tidak Ditemukan</h3>
    </div>
 <% } %> 
 
