@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+   <h1 class="h2"><%= pageTitle %></h1>
+</div>
+
+<div class="row mt-4">
+   <div class="col">
+      <a href="/user/tambah-user" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-2"></i>User</a>
+   </div>
+   <div class="col">
+      <form class="form-inline float-right" action="" method="post">
+         <label class="sr-only" for="inlineFormInputGroupSearch2">Cari</label>
+         <div class="input-group mb-2 mr-sm-2">
+            <input type="text" name="keyword" class="form-control form-control-sm" id="inlineFormInputGroupSearch2" placeholder="Cari sesuatu...">
+         </div>
+         <button type="submit" name="search" class="btn btn-primary btn-sm mb-2"><i class="fas fa-search "></i></button>
+      </form>
+   </div>
+</div>
+
+<%- include('../../includes/alert.ejs', { type: type, message: message }) %> 
+
+<% if (users.length > 0) { %>
+   <table class="table table-bordered mt-3 text-center">
+      <thead>
+         <tr>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col" style="width:  12%">Aksi</th>
+         </tr>
+      </thead>
+      <tbody>
+         <% for( let user of users ) { %>
+            <tr>
+               <td><%= user.email %> </td>
+               <td><%= user.role %> </td>
+               <td>
+                  <a href="/user/ubah-user/<%= user.id %>" class="btn btn-warning btn-sm text-light"><i class="fas fa-edit"></i></a>
+                  <form action="/user/hapus-user" method="POST" class="d-inline">
+                     <input type="hidden" name="userId" value="<%= user.id %>">
+                     <button type="submit" class="btn btn-danger btn-sm text-light"><i class="fas fa-trash"></i></button>
+                  </form>
+               </td>
+            </tr>
+         <% } %>
+      </tbody>
+   </table>
+<% } else { %>
+   <div class="mt-5">
+      <h3 class="text-center">Data User Tidak Ditemukan</h3>
+   </div>
+<% } %> 
+

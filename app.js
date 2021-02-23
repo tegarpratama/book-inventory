@@ -71,6 +71,7 @@ const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const masterRoutes = require('./routes/master');
 const transactionRoutes = require('./routes/transaction');
+const userRoutes = require('./routes/user');
 
 // configure body-parser package
 app.use(bodyParser.urlencoded({ extended: false}));
@@ -101,6 +102,7 @@ app.use(authRoutes);
 app.use(dashboardRoutes);
 app.use('/master', masterRoutes);
 app.use('/transaksi', transactionRoutes);
+app.use('/user', userRoutes);
 app.get('/500', errorController.get500);
 app.use(errorController.get404);
 
