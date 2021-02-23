@@ -1,16 +1,18 @@
 const express = require('express');
 const { body } = require('express-validator');
 
-const incomeBookController = require('../controllers/enter');
+const enterBookController = require('../controllers/enter');
+const exitBookController = require('../controllers/exit');
 const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-router.get('/barang-masuk', isAuth, incomeBookController.index);
+// =================== Barang Masuk ======================
+router.get('/barang-masuk', isAuth, enterBookController.index);
 
-router.get('/tambah-barang-masuk', isAuth, incomeBookController.create);
+router.get('/tambah-barang-masuk', isAuth, enterBookController.create);
 
-router.post('/tambah-barang', [
+router.post('/tambah-barang-masuk', [
    body('bookId')
       .notEmpty()
       .withMessage('Judul buku tidak boleh kosong'),
@@ -19,9 +21,27 @@ router.post('/tambah-barang', [
       .withMessage('Jumlah barang masuk tidak boleh kosong')
       .isInt()
       .withMessage('Jumlah barang masuk harus angka')
-], isAuth, incomeBookController.store);
+], isAuth, enterBookController.store);
 
-router.post('/hapus-barang-masuk', isAuth, incomeBookController.destroy);
+router.post('/hapus-barang-masuk', isAuth, enterBookController.destroy);
+
+// =================== Barang Keluar ======================
+router.get('/barang-keluar', isAuth, exitBookController.index);
+
+router.get('/tambah-barang-keluar', isAuth, exitBookController.create);
+
+router.post('/tambah-barang-keluar', [
+   body('bookId')
+      .notEmpty()
+      .withMessage('Judul buku tidak boleh kosong'),
+   body('stockOut')
+      .notEmpty()
+      .withMessage('Jumlah barang keluar tidak boleh kosong')
+      .isInt()
+      .withMessage('Jumlah barang keluar harus angka')
+], isAuth, exitBookController.store);
+
+router.post('/hapus-barang-keluar', isAuth, exitBookController.destroy);
 
 module.exports = router;
 

@@ -1,17 +1,17 @@
 const { validationResult } = require('express-validator');
 
-const EnterBook = require('../models/enter');
+const ExitBook = require('../models/exit');
 const Book = require('../models/book');
 
 exports.index = async (req, res, next) => {
    try {
-      const enterBooks = await  EnterBook.findAll({include: [{model: Book}]});
+      const exitBooks = await  ExitBook.findAll({include: [{model: Book}]});
 
       res.render('main', {
-         pageTitle: 'Barang Masuk',
-         path: '/transaksi/barang-masuk',
-         view: '/pages/transaction/enter.ejs',
-         enterBooks: enterBooks,
+         pageTitle: 'Barang Keluar',
+         path: '/transaksi/barang-keluar',
+         view: '/pages/transaction/exit.ejs',
+         exitBooks: exitBooks,
          type: req.flash('type'),
          message: req.flash('message')
       });
@@ -21,17 +21,17 @@ exports.index = async (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
    } 
-};
+}
 
 exports.create = async (req, res, next) => {
    try {
       const books = await Book.findAll();
 
       res.render('main', {
-         pageTitle: 'Tambah Barang Masuk',
-         path: '/transaksi/barang-masuk',
+         pageTitle: 'Tambah Barang Keluar',
+         path: '/transaksi/barang-keluar',
          books: books,
-         view: '/pages/transaction/enter-create.ejs',
+         view: '/pages/transaction/exit-create.ejs',
          type: req.flash('type'),
          message: req.flash('message')
       });
@@ -46,19 +46,19 @@ exports.create = async (req, res, next) => {
 exports.store = async (req, res, next) => {
    const errors = validationResult(req);
    const bookId = +req.body.bookId;
-   const stockIn = +req.body.stockIn;
+   const stockOut = +req.body.stockOut;
 
    try {
       const books = await Book.findAll();
       const book = await Book.findByPk(bookId);
 
-      let totalStock = book.stock + stockIn;
+      let totalStock = book.stock - stockOut;
 
       if(!errors.isEmpty()) {
          return res.status(422).render('main', {
-            pageTitle: 'Tambah Barang Masuk',
-            path: '/transaksi/barang-masuk',
-            view: '/pages/transaction/enter-create.ejs',
+            pageTitle: 'Tambah Barang Keluar',
+            path: '/transaksi/barang-keluar',
+            view: '/pages/transaction/exit-create.ejs',
             books: books,
             type: 'danger',
             message: errors.array()[0].msg,
@@ -66,18 +66,18 @@ exports.store = async (req, res, next) => {
          });
       }
 
-      const enterBook = new EnterBook({
+      const exitBook = new ExitBook({
          bookId: bookId,
-         stockIn: stockIn,
+         stockOut: stockOut,
          userId: req.user.id
       });
 
-      await enterBook.save();
+      await exitBook.save();
       await book.update({ stock: totalStock }, {where: { id: bookId }});
 
       req.flash('type', 'success');
-      req.flash('message', 'Berhasil menambahkan barang masuk');
-      res.redirect('/transaksi/barang-masuk');
+      req.flash('message', 'Berhasil menambahkan barang keluar');
+      res.redirect('/transaksi/barang-keluar');
    } catch (err) {
       const error = new Error(err);
       console.log(error);
@@ -90,16 +90,16 @@ exports.destroy = async (req, res, next) => {
    const bookId = req.body.bookId;
 
    try {
-      const enterBook = await EnterBook.findByPk(bookId);
-      const book = await Book.findByPk(enterBook.bookId);
+      const exitBook = await ExitBook.findByPk(bookId);
+      const book = await Book.findByPk(exitBook.bookId);
 
-      let totalStock = book.stock - enterBook.stockIn;
-      await book.update({ stock: totalStock }, {where: { id: enterBook.bookId }});
-      await enterBook.destroy();
+      let totalStock = book.stock + exitBook.stockOut;
+      await book.update({ stock: totalStock }, {where: { id: exitBook.bookId }});
+      await exitBook.destroy();
 
       req.flash('type', 'success');
-      req.flash('message', 'Barang masuk berhasil dihapus');
-      res.redirect('/transaksi/barang-masuk');
+      req.flash('message', 'Barang keluar berhasil dihapus');
+      res.redirect('/transaksi/barang-keluar');
    } catch (err) {
       const error = new Error(err);
       console.log(error);

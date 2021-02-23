@@ -112,24 +112,27 @@ app.use(errorController.get404);
 //    });
 // });
 
-// set relation table
-User.hasOne(Book);
+User.hasMany(Book);
 Book.belongsTo(User);
 
-User.belongsToMany(Book, { through: Enter });
-Book.belongsToMany(User, { through: Enter });
+User.hasMany(Enter);
+Enter.belongsTo(User);
 
-User.belongsToMany(Book, { through: Exit });
-Book.belongsToMany(User, { through: Exit });
+Book.hasMany(Enter, {onDelete: 'cascade'});
+Enter.belongsTo(Book);
+
+Book.hasMany(Exit, {onDelete: 'cascade'});
+Exit.belongsTo(Book);
 
 // migrate database
 sequelize.sync()
+// sequelize.sync({force: true})
    .then(() => {
       return User.findByPk(1);
    })
    .then(user => {
       if(!user) {
-         return User.create({ name: 'Admin', email: 'admin@mail.com', role: 'admin' });
+         return User.create({ name: 'Admin', email: 'admin@mail.com', password: '$2y$08$qUOomlaSfodvtdKqRoLAjemSUfIqcEUBx4g55WCpeYk2hIjmKDSHS', role: 'admin' });
       }
       return user;
    })

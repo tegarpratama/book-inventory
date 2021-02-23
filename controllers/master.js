@@ -217,7 +217,11 @@ exports.destroy = async (req, res, next) => {
 
    try {
       const book = await Book.findByPk(bookId);
-      fileHelper.deleteFile(book.cover);
+
+      if (book.cover) {
+         fileHelper.deleteFile(book.cover);
+      }
+      
       await book.destroy();
       req.flash('type', 'success');
       req.flash('message', 'Buku berhasil dihapus');

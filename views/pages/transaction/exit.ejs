@@ -6,7 +6,7 @@
 
 <div class="row mt-4">
    <div class="col">
-      <a href="/transaksi/tambah-barang-masuk" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-2"></i>Barang Masuk</a>
+      <a href="/transaksi/tambah-barang-keluar" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-2"></i>Barang Keluar</a>
    </div>
    <div class="col">
       <form class="form-inline float-right" action="" method="post">
@@ -19,25 +19,25 @@
    </div>
 </div>
 
-<% if (enterBooks.length > 0) { %>
+<% if (exitBooks.length > 0) { %>
    <table class="table table-bordered mt-3 text-center">
       <thead>
          <tr>
             <th scope="col">Nama Buku</th>
-            <th scope="col">Total Buku Masuk</th>
+            <th scope="col">Total Buku Keluar</th>
             <th scope="col">Tanggal</th>
             <th scope="col" style="width:  9%">Action</th>
          </tr>
       </thead>
       <tbody>
-         <% for (let enterBook of enterBooks) { %>
+         <% for (let exitBook of exitBooks) { %>
             <tr>
-               <td><%= enterBook.book.title %> </td>
-               <td><%= enterBook.stockIn %> </td>
-               <td><%= new Date(enterBook.createdAt) %> </td>
+               <td><%= exitBook.book.title %> </td>
+               <td><%= exitBook.stockOut %> </td>
+               <td><%= new Date(exitBook.createdAt) %> </td>
                <td>
-                  <form action="/transaksi/hapus-barang-masuk" method="POST">
-                     <input type="hidden" name="bookId" value="<%= enterBook.id %>">
+                  <form action="/transaksi/hapus-barang-keluar" method="POST">
+                     <input type="hidden" name="bookId" value="<%= exitBook.id %>">
                      <button class="btn btn-danger btn-sm" type="submit" name="submit"><i class="fas fa-trash"></i></button>
                   </form>
                </td>
