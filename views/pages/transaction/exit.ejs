@@ -26,7 +26,9 @@
             <th scope="col">Nama Buku</th>
             <th scope="col">Total Buku Keluar</th>
             <th scope="col">Tanggal</th>
-            <th scope="col" style="width:  9%">Action</th>
+            <% if (isAdmin) { %>
+               <th scope="col" style="width:  9%">Action</th>
+            <% } %>
          </tr>
       </thead>
       <tbody>
@@ -35,12 +37,14 @@
                <td><%= exitBook.book.title %> </td>
                <td><%= exitBook.stockOut %> </td>
                <td><%= new Date(exitBook.createdAt) %> </td>
-               <td>
-                  <form action="/transaksi/hapus-barang-keluar" method="POST">
-                     <input type="hidden" name="bookId" value="<%= exitBook.id %>">
-                     <button class="btn btn-danger btn-sm" type="submit" name="submit"><i class="fas fa-trash"></i></button>
-                  </form>
-               </td>
+               <% if (isAdmin) { %>
+                  <td>
+                     <form action="/transaksi/hapus-barang-keluar" method="POST">
+                        <input type="hidden" name="bookId" value="<%= exitBook.id %>">
+                        <button class="btn btn-danger btn-sm" type="submit" name="submit"><i class="fas fa-trash"></i></button>
+                     </form>
+                  </td>
+               <% } %>
             </tr>
          <% } %>
       </tbody>

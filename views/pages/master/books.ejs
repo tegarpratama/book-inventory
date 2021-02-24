@@ -39,11 +39,13 @@
                <td><%= book.stock %> </td>
                <td>
                   <a href="/master/detail-buku/<%= book.id %>" class="btn btn-secondary btn-sm  text-light"><i class="fas fa-info-circle"></i></a>
-                  <a href="/master/ubah-buku/<%= book.id %>" class="btn btn-warning btn-sm text-light"><i class="fas fa-edit"></i></a>
-                  <form action="/master/hapus-buku" method="POST" class="d-inline">
-                     <input type="hidden" name="bookId" value="<%= book.id %>">
-                     <button type="submit" class="btn btn-danger btn-sm text-light"><i class="fas fa-trash"></i></button>
-                  </form>
+                  <% if (isAdmin) { %>
+                     <a href="/master/ubah-buku/<%= book.id %>" class="btn btn-warning btn-sm text-light"><i class="fas fa-edit"></i></a>
+                     <form action="/master/hapus-buku" method="POST" class="d-inline">
+                        <input type="hidden" name="bookId" value="<%= book.id %>">
+                        <button type="submit" class="btn btn-danger btn-sm text-light"><i class="fas fa-trash"></i></button>
+                     </form>
+                  <% } %>
                </td>
             </tr>
          <% } %>

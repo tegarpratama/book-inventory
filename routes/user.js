@@ -2,14 +2,14 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const userController = require('../controllers/user');
-const User = require('../models/user');
 const isAuth = require('../middleware/is-auth');
+const isAdmin = require('../middleware/is-admin');
 
 const router = express.Router();
 
-router.get('/', isAuth, userController.index);
+router.get('/', isAuth, isAdmin, userController.index);
 
-router.get('/tambah-user', isAuth, userController.create);
+router.get('/tambah-user', isAuth, isAdmin, userController.create);
 
 router.post('/tambah-user', [
    body('email')
@@ -27,9 +27,9 @@ router.post('/tambah-user', [
    body('role')
       .notEmpty()
       .withMessage('Role tidak boleh kosong')
-],isAuth, userController.store);
+],isAuth, isAdmin, userController.store);
 
-router.get('/ubah-user/:userId', isAuth, userController.edit);
+router.get('/ubah-user/:userId', isAuth, isAdmin, userController.edit);
 
 router.post('/ubah-user', [
    body('email')
@@ -43,8 +43,8 @@ router.post('/ubah-user', [
    body('role')
       .notEmpty()
       .withMessage('Role tidak boleh kosong')
-],isAuth, userController.update);
+],isAuth, isAdmin, userController.update);
 
-router.post('/hapus-user', isAuth, userController.destroy);
+router.post('/hapus-user', isAuth, isAdmin, userController.destroy);
 
 module.exports = router;

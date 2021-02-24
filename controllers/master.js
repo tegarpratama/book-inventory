@@ -12,11 +12,13 @@ exports.index = async (req, res, next) => {
          path: '/master',
          view: '/pages/master/books.ejs',
          books: books,
+         isAdmin: res.locals.isAdmin,
          type: req.flash('type'),
          message: req.flash('message')
       });
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    } 
@@ -29,13 +31,13 @@ exports.create = (req, res, next) => {
       view: 'pages/master/edit-book.ejs',
       editing: false,
       hasError: false,
-      type: '',
-      message: [],
+      type: req.flash('type'),
+      message: req.flash('message'),
       validationErrors: [],
    });
 };
 
-exports.store = (req, res, next) => {
+exports.store = async (req, res, next) => {
    const errors = validationResult(req);
    const title = req.body.title;
    const author = req.body.author;
@@ -83,27 +85,28 @@ exports.store = (req, res, next) => {
       stock: stock,
       description: description,
       cover: cover,
-      userId: req.user.id
+      userId: req.session.userId
    });
    
-   book.save()
-      .then(() => {
-         req.flash('type', 'success');
-         req.flash('message', 'Berhasil menambahkan data buku baru');
-         res.redirect('/master/buku');
-      })
-      .catch(err => {
-         const error = new Error(err);
-         error.httpStatusCode = 500;
-         return next(error);
-      });
+   try {
+      await book.save()
+
+      req.flash('type', 'success');
+      req.flash('message', 'Berhasil menambahkan data buku baru');
+      res.redirect('/master/buku');
+   } catch (err) {
+      const error = new Error(err);
+      console.log(error);
+      error.httpStatusCode = 500;
+      return next(error);
+   }
 };
 
 exports.edit = async (req, res, next) => {
    const bookId = req.params.bookId;
 
    try {
-      const book = await Book.findByPk(bookId, { userId: req.user.id })
+      const book = await Book.findByPk(bookId)
 
       if(!book) {
          req.flash('type', 'danger');
@@ -148,6 +151,7 @@ exports.update = async (req, res, next) => {
          view: 'pages/master/edit-book.ejs',
          editing: true,
          hasError: true,
+         isAdmin: res.locals.isAdmin,
          book: {
             id: bookId,
             title: title,
@@ -173,7 +177,7 @@ exports.update = async (req, res, next) => {
       book.price = price;
       book.stock = stock;
       book.description = description;
-      book.userId = req.user.id;
+      book.userId = req.session.userId;
 
       if(cover) {
          fileHelper.deleteFile(book.cover);
@@ -184,6 +188,7 @@ exports.update = async (req, res, next) => {
       res.redirect('/master/buku');
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }
@@ -193,7 +198,7 @@ exports.show = async (req, res, next) => {
    const bookId = req.params.bookId;
 
    try {
-      const book = await Book.findByPk(bookId, { id: bookId });
+      const book = await Book.findByPk(bookId);
 
       if(!book) {
          return res.redirect('/master/buku');
@@ -207,6 +212,7 @@ exports.show = async (req, res, next) => {
       });
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }
@@ -223,11 +229,13 @@ exports.destroy = async (req, res, next) => {
       }
       
       await book.destroy();
+
       req.flash('type', 'success');
       req.flash('message', 'Buku berhasil dihapus');
       res.redirect('/master/buku');
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }

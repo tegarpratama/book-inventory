@@ -50,6 +50,9 @@ exports.store = async (req, res, next) => {
          view: '/pages/user/edit.ejs',
          editing: false,
          hasError: true,
+         user: {
+            email: email
+         },
          type: 'danger',
          message: errors.array()[0].msg,
          validationErrors: errors.array(),
@@ -57,12 +60,14 @@ exports.store = async (req, res, next) => {
    }
 
    try {
-      const emailExists = await User.findOne({where: { email: email }});
+      const emailExists = await User.findOne(
+         { where: { email: email }}
+      );
       
       if (emailExists) {
          req.flash('type', 'danger');
-         req.flash('message', 'Email sudah terdaftar');
-        return res.redirect('/user/tambah-user');
+         req.flash('message', 'Gagal menambahkan user baru, email sudah terdaftar');
+        return res.redirect('/user');
       }
 
       const hashedPassword = await bcrypt.hash(password, 8);
@@ -73,11 +78,13 @@ exports.store = async (req, res, next) => {
       });
 
       await user.save();
+
       req.flash('type', 'success');
       req.flash('message', 'Berhasil menambahkan user baru');
       res.redirect('/user');
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }
@@ -85,6 +92,7 @@ exports.store = async (req, res, next) => {
 
 exports.edit = async (req, res, next) => {
    const userId = req.params.userId;
+
    try {
       const user = await User.findByPk(userId);
 
@@ -107,6 +115,7 @@ exports.edit = async (req, res, next) => {
       });
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }
@@ -155,9 +164,11 @@ exports.update = async (req, res,  next) => {
       }
 
       await user.save();
+
       res.redirect('/user');
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }
@@ -175,6 +186,7 @@ exports.destroy = async (req, res, next) => {
       res.redirect('/user');
    } catch (err) {
       const error = new Error(err);
+      console.log(error);
       error.httpStatusCode = 500;
       return next(error);
    }

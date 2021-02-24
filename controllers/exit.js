@@ -5,12 +5,15 @@ const Book = require('../models/book');
 
 exports.index = async (req, res, next) => {
    try {
-      const exitBooks = await  ExitBook.findAll({include: [{model: Book}]});
+      const exitBooks = await  ExitBook.findAll(
+         {include: [{ model: Book }]}
+      );
 
       res.render('main', {
          pageTitle: 'Barang Keluar',
          path: '/transaksi/barang-keluar',
          view: '/pages/transaction/exit.ejs',
+         isAdmin: res.locals.isAdmin,
          exitBooks: exitBooks,
          type: req.flash('type'),
          message: req.flash('message')
@@ -50,10 +53,7 @@ exports.store = async (req, res, next) => {
 
    try {
       const books = await Book.findAll();
-      const book = await Book.findByPk(bookId);
-
-      let totalStock = book.stock - stockOut;
-
+     
       if(!errors.isEmpty()) {
          return res.status(422).render('main', {
             pageTitle: 'Tambah Barang Keluar',
@@ -66,14 +66,20 @@ exports.store = async (req, res, next) => {
          });
       }
 
+      const book = await Book.findByPk(bookId);
+      let totalStock = book.stock - stockOut;
+
       const exitBook = new ExitBook({
          bookId: bookId,
          stockOut: stockOut,
-         userId: req.user.id
+         userId: req.session.userId
       });
 
       await exitBook.save();
-      await book.update({ stock: totalStock }, {where: { id: bookId }});
+      await book.update(
+         { stock: totalStock }, 
+         { where: { id: bookId }}
+      );
 
       req.flash('type', 'success');
       req.flash('message', 'Berhasil menambahkan barang keluar');
@@ -94,7 +100,11 @@ exports.destroy = async (req, res, next) => {
       const book = await Book.findByPk(exitBook.bookId);
 
       let totalStock = book.stock + exitBook.stockOut;
-      await book.update({ stock: totalStock }, {where: { id: exitBook.bookId }});
+
+      await book.update(
+         { stock: totalStock }, 
+         { where: { id: exitBook.bookId }}
+      );
       await exitBook.destroy();
 
       req.flash('type', 'success');

@@ -4,7 +4,11 @@
 
 <div class="row">
    <div class="col-3">
-      <img class="img-fluid" src="/<%= book.cover %>" alt="<%= book.title %>">
+      <% if (book.cover) { %>
+         <img class="img-fluid" src="/<%= book.cover %>" alt="<%= book.title %>">
+      <% } else { %>
+         <p>No Image</p>
+      <% } %> 
    </div>
    <div class="col">
       <table class="table table-bordered table-hover">

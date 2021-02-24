@@ -11,35 +11,19 @@ const flash = require('connect-flash');
 
 // import file
 const errorController = require('./controllers/error');
-const User = require('./models/user');
-const Book = require('./models/book');
-const Enter = require('./models/enter')
-const Exit = require('./models/exit');
 const sequelize = require('./config/database');
 
+// import routes
+const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
+const masterRoutes = require('./routes/master');
+const transactionRoutes = require('./routes/transaction');
+const userRoutes = require('./routes/user');
 
-// define express
+// express
 const app = express();
 
-// set session store in server side
-app.use(
-   session({
-      secret: "keyboard cat",
-      resave: false,
-      saveUninitialized: false,
-      store: new SequelizeStore({
-         db: sequelize,
-      }),
-      resave: false, // we support the touch method so per the express-session docs this should be set to false
-      proxy: true, // if you do SSL outside of node.
-   })
-);
-
-// use session
-app.use(flash());
-
-
-// define file storage for image
+// file storage for image
 const fileStorage = multer.diskStorage({
    destination: (req, file, cb) => {
       cb(null, 'images');
@@ -62,40 +46,39 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-// set template engine & views folder
+// template engine & views folder
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-// import routes
-const authRoutes = require('./routes/auth');
-const dashboardRoutes = require('./routes/dashboard');
-const masterRoutes = require('./routes/master');
-const transactionRoutes = require('./routes/transaction');
-const userRoutes = require('./routes/user');
-
-// configure body-parser package
+// session store in server side
+app.use(
+   session({
+      secret: "keyboard cat",
+      saveUninitialized: false,
+      store: new SequelizeStore({
+         db: sequelize,
+      }),
+      resave: false, // we support the touch method so per the express-session docs this should be set to false
+      proxy: true, // if you do SSL outside of node.
+   })
+);
+// session
+app.use(flash());
+// body-parser package
 app.use(bodyParser.urlencoded({ extended: false}));
-
-// use multer package
+// multer package
 app.use(
    multer({ storage: fileStorage, fileFilter: fileFilter }).single('cover')
 );
-
 // set static directory
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
-// Dummy user data
+// set local variables
 app.use((req, res, next) => {
-   User.findByPk(1)
-      .then(user => {
-         req.user = user;
-         next();
-      })
-      .catch(err => console.log(err));
-});
-
-
+   res.locals.isAuth = (req.session.isLoggedIn) ? true : false;
+   res.locals.isAdmin = (req.session.userRole === 'admin') ? true : false;
+   next();
+ });
 
 // routes
 app.use(authRoutes);
@@ -107,40 +90,16 @@ app.get('/500', errorController.get500);
 app.use(errorController.get404);
 
 // route for error
-// app.use((error, req, res, next) => {
-//    res.status(500).render('error/500', {
-//       pageTitle: 'Something when wrong',
-//       path: '/500'
-//    });
-// });
+app.use((error, req, res, next) => {
+   res.status(500).render('error/500', {
+      pageTitle: 'Something when wrong',
+      path: '/500'
+   });
+});
 
-User.hasMany(Book);
-Book.belongsTo(User);
-
-User.hasMany(Enter);
-Enter.belongsTo(User);
-
-Book.hasMany(Enter, {onDelete: 'cascade'});
-Enter.belongsTo(Book);
-
-Book.hasMany(Exit, {onDelete: 'cascade'});
-Exit.belongsTo(Book);
-
-// migrate database
-sequelize.sync()
-// sequelize.sync({force: true})
-   .then(() => {
-      return User.findByPk(1);
-   })
-   .then(user => {
-      if(!user) {
-         return User.create({ name: 'Admin', email: 'admin@mail.com', password: '$2y$08$qUOomlaSfodvtdKqRoLAjemSUfIqcEUBx4g55WCpeYk2hIjmKDSHS', role: 'admin' });
-      }
-      return user;
-   })
-   .catch(err => {
-      console.log(err);
-    });
+// migration
+const migrate = require('./config/migrate');
+migrate.sequelize;
 
 // set port
 app.listen(3000);

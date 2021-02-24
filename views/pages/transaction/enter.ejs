@@ -26,7 +26,9 @@
             <th scope="col">Nama Buku</th>
             <th scope="col">Total Buku Masuk</th>
             <th scope="col">Tanggal</th>
-            <th scope="col" style="width:  9%">Action</th>
+            <% if (isAdmin) { %>
+               <th scope="col" style="width:  9%">Action</th>
+            <% } %>
          </tr>
       </thead>
       <tbody>
@@ -35,12 +37,14 @@
                <td><%= enterBook.book.title %> </td>
                <td><%= enterBook.stockIn %> </td>
                <td><%= new Date(enterBook.createdAt) %> </td>
-               <td>
-                  <form action="/transaksi/hapus-barang-masuk" method="POST">
-                     <input type="hidden" name="bookId" value="<%= enterBook.id %>">
-                     <button class="btn btn-danger btn-sm" type="submit" name="submit"><i class="fas fa-trash"></i></button>
-                  </form>
-               </td>
+               <% if (isAdmin) { %>
+                  <td>
+                     <form action="/transaksi/hapus-barang-masuk" method="POST">
+                        <input type="hidden" name="bookId" value="<%= enterBook.id %>">
+                        <button class="btn btn-danger btn-sm" type="submit" name="submit"><i class="fas fa-trash"></i></button>
+                     </form>
+                  </td>
+               <% } %>
             </tr>
          <% } %>
       </tbody>
