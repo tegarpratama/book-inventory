@@ -8,6 +8,7 @@ const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const flash = require('connect-flash');
+const csrf = require('csurf');
 
 // import file
 const errorController = require('./controllers/error');
@@ -50,6 +51,9 @@ const fileFilter = (req, file, cb) => {
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+// set static directory
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 // session store in server side
 app.use(
    session({
@@ -62,23 +66,23 @@ app.use(
       proxy: true, // if you do SSL outside of node.
    })
 );
-// session
-app.use(flash());
 // body-parser package
 app.use(bodyParser.urlencoded({ extended: false}));
+// csrf
+app.use(csrf());
+// flash
+app.use(flash());
 // multer package
 app.use(
    multer({ storage: fileStorage, fileFilter: fileFilter }).single('cover')
 );
-// set static directory
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/images', express.static(path.join(__dirname, 'images')));
 // set local variables
 app.use((req, res, next) => {
    res.locals.isAuth = (req.session.isLoggedIn) ? true : false;
    res.locals.isAdmin = (req.session.userRole === 'admin') ? true : false;
+   res.locals._csrf = req.csrfToken();
    next();
- });
+});
 
 // routes
 app.use(authRoutes);
@@ -88,7 +92,6 @@ app.use('/transaksi', transactionRoutes);
 app.use('/user', userRoutes);
 app.get('/500', errorController.get500);
 app.use(errorController.get404);
-
 // route for error
 app.use((error, req, res, next) => {
    res.status(500).render('error/500', {

@@ -19,6 +19,7 @@
                <%- include('../includes/alert.ejs', {type: type, message: message} ) %> 
                
                <form class="form-signin" action="/login" method="post">
+                  <input type="hidden" name="_csrf" value="<%= _csrf %>">
                   <div class="form-label-group">
                      <input type="email" id="email" class="form-control" placeholder="Email" name="email" required autofocus>
                      <label for="email">Email</label>

@@ -3,6 +3,7 @@ exports.getIndex = (req, res, next) => {
       pageTitle: 'Dashboard',
       path: '/',
       view: 'pages/dashboard/index.ejs',
+      csrfToken: req.csrfToken(),
       type: req.flash('type'),
       message: req.flash('message')
    });

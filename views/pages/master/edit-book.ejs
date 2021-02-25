@@ -4,8 +4,7 @@
 
 <%- include('../../includes/alert.ejs', {type: type, message: message} ) %> 
 
-<form action="<% if (editing) { %>/master/ubah-buku<% } else { %>/master/tambah-buku<% } %>" method="POST" enctype="multipart/form-data">
-
+<form action="<% if (editing) { %>/master/ubah-buku/?_csrf=<%= _csrf %><% } else { %>/master/tambah-buku/?_csrf=<%= _csrf %><% } %>" method="POST" enctype="multipart/form-data">
    <% if (editing) { %>
       <input type="hidden" value="<%= book.id %>" name="bookId">
   <% } %>

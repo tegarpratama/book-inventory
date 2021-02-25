@@ -6,7 +6,6 @@ const fileHelper = require('../config/file.js');
 exports.index = async (req, res, next) => {
    try {
       const books = await Book.findAll();
-
       res.render('main', {
          pageTitle: 'Data Buku',
          path: '/master',
