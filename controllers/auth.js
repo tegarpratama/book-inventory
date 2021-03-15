@@ -16,15 +16,16 @@ exports.postLogin = async (req, res, next) => {
    const password = req.body.password;
    
    try {
+      // check email
       const user = await User.findOne({ where: { email: email} });
-      const isMatch = await bcyrpt.compare(password, user.password);
-
       if (!user) {
          req.flash('type', 'danger');
          req.flash('error', 'Email atau password salah');
          return res.redirect('/login');
       }
 
+      // check password
+      const isMatch = await bcyrpt.compare(password, user.password);
       if (isMatch) {
          await req.session.save();
 

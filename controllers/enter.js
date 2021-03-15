@@ -8,6 +8,8 @@ exports.index = async (req, res, next) => {
       const enterBooks = await  EnterBook.findAll(
          { include: [{ model: Book }] }
       );
+      // const enterBooks = await EnterBook.findAll();
+      console.log(enterBooks);
 
       res.render('main', {
          pageTitle: 'Barang Masuk',

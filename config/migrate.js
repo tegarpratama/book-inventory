@@ -10,11 +10,14 @@ Book.belongsTo(User);
 User.hasMany(Enter);
 Enter.belongsTo(User);
 
+User.hasMany(Exit);
+Exit.belongsTo(User);
+
 Book.hasMany(Enter, {onDelete: 'cascade'});
-Enter.belongsTo(Book);
+Enter.belongsTo(Book, {foreignKey: 'bookId'});
 
 Book.hasMany(Exit, {onDelete: 'cascade'});
-Exit.belongsTo(Book);
+Exit.belongsTo(Book, {foreignKey: 'bookId'});
 
 sequelize.sync()
 // sequelize.sync({force: true})

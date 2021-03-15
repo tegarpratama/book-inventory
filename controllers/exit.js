@@ -5,7 +5,7 @@ const Book = require('../models/book');
 
 exports.index = async (req, res, next) => {
    try {
-      const exitBooks = await  ExitBook.findAll(
+      const exitBooks = await ExitBook.findAll(
          {include: [{ model: Book }]}
       );
 
